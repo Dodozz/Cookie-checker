@@ -555,10 +555,16 @@
         </div>
 
         <div class="cors-notice">
-            <h3>⚠️ CORS PROXY ENABLED</h3>
+            <h3>⚠️ TECHNICAL LIMITATIONS</h3>
             <p>
-                This dashboard uses a CORS proxy to bypass Roblox API restrictions. All requests are processed through <strong>corsproxy.io</strong> for secure data retrieval.
-                Your data is processed locally in your browser and never stored on external servers.
+                <strong>Browser Security Restrictions:</strong> Due to CORS (Cross-Origin Resource Sharing) policies, some authenticated Roblox API endpoints cannot be accessed directly from the browser.<br><br>
+                <strong>What Will Work:</strong> Public data like username, user ID, friends count, followers count, account creation date.<br><br>
+                <strong>What May Not Work:</strong> Authenticated data like Robux balance, transactions, email, phone, birthdate - these require the .ROBLOSECURITY cookie to be properly sent to Roblox servers.<br><br>
+                <strong>Solutions:</strong><br>
+                • Install a CORS browser extension ("Allow CORS: Access-Control-Allow-Origin" for Chrome/Firefox)<br>
+                • The dashboard will try multiple CORS proxies automatically<br>
+                • All data processing happens in your browser - nothing is sent to external servers<br><br>
+                Open your browser's Developer Console (F12) to see detailed logs of what data is being fetched.
             </p>
         </div>
 
@@ -566,7 +572,11 @@
             <h3>⚡ AUTHENTICATION PROTOCOL ⚡</h3>
             
             <div class="warning-box">
-                ⚠️ <strong>SECURITY WARNING:</strong> Never share your .ROBLOSECURITY cookie. This grants full access to your account.
+                ⚠️ <strong>SECURITY WARNING:</strong> Never share your .ROBLOSECURITY cookie. This grants full access to your account.<br><br>
+                <strong>IMPORTANT:</strong> Due to browser security restrictions, some authenticated data may not be accessible. For best results:<br>
+                • Install a CORS extension (e.g., "Allow CORS" for Chrome/Firefox)<br>
+                • Or use this dashboard from a browser extension environment<br>
+                • Public data (username, friends count, followers) will always work
             </div>
 
             <div class="input-group">
@@ -785,48 +795,66 @@
         // Global state management using JavaScript variables
         let userData = null;
         let currentCookie = '';
-        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        
+        // Multiple CORS proxy options to try
+        const CORS_PROXIES = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/'
+        ];
+        let currentProxyIndex = 0;
 
-        // Helper function to make authenticated requests with CORS proxy
+        // Helper function to make authenticated requests with multiple proxy attempts
         async function makeRobloxRequest(url, cookie, needsAuth = false) {
-            try {
-                const proxyUrl = CORS_PROXY + encodeURIComponent(url);
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-                
-                // For authenticated endpoints, we'll use a different approach
-                // Since CORS proxies don't pass cookies, we try direct first, then fallback
-                let response;
-                
-                if (needsAuth) {
-                    // Try direct request with credentials (may work if user has CORS extension)
-                    try {
-                        response = await fetch(url, {
-                            method: 'GET',
-                            credentials: 'include',
-                            headers: {
-                                'Cookie': `.ROBLOSECURITY=${cookie}`
-                            }
-                        });
-                    } catch (e) {
-                        // If direct fails, try proxy (but it won't have auth)
-                        response = await fetch(proxyUrl);
+            // Try direct request first (works if user has CORS extension or if endpoint allows it)
+            if (needsAuth) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Cookie': `.ROBLOSECURITY=${cookie}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        return await response.json();
                     }
-                } else {
-                    // Public endpoints can use proxy
-                    response = await fetch(proxyUrl);
+                } catch (e) {
+                    console.log('Direct request failed, trying proxies...', e.message);
                 }
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Request error:', error);
-                throw error;
             }
+            
+            // Try all CORS proxies
+            for (let i = 0; i < CORS_PROXIES.length; i++) {
+                try {
+                    const proxy = CORS_PROXIES[i];
+                    const proxyUrl = proxy + (proxy.includes('?') ? '' : '') + encodeURIComponent(url);
+                    
+                    console.log(`Trying proxy ${i + 1}/${CORS_PROXIES.length}: ${proxy}`);
+                    
+                    const response = await fetch(proxyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Success with proxy:', proxy);
+                        return data;
+                    }
+                } catch (error) {
+                    console.log(`Proxy ${i + 1} failed:`, error.message);
+                    if (i === CORS_PROXIES.length - 1) {
+                        throw error;
+                    }
+                }
+            }
+            
+            throw new Error('All proxy attempts failed');
         }
 
         // Format number with commas
@@ -889,23 +917,46 @@
 
             try {
                 // First, try to get authenticated user (validates cookie)
-                const authUser = await makeRobloxRequest(
-                    'https://users.roblox.com/v1/users/authenticated',
-                    cookie,
-                    true
-                );
+                console.log('Fetching authenticated user...');
+                let authUser, userId;
+                
+                try {
+                    authUser = await makeRobloxRequest(
+                        'https://users.roblox.com/v1/users/authenticated',
+                        cookie,
+                        true
+                    );
+                    userId = authUser.id;
+                    console.log('✓ Authenticated user:', userId);
+                } catch (error) {
+                    console.error('Failed to authenticate:', error);
+                    throw new Error('Could not validate cookie. Make sure it\'s correct and try enabling a CORS browser extension.');
+                }
 
-                const userId = authUser.id;
-
-                // Fetch all data in parallel
+                // Fetch public data (works without auth)
+                console.log('Fetching public data...');
                 const [userDetails, friendsCount, followersCount, followingCount] = await Promise.all([
-                    makeRobloxRequest(`https://users.roblox.com/v1/users/${userId}`, cookie, false),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, cookie, false),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, cookie, false),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followings/count`, cookie, false).catch(() => ({ count: 0 }))
+                    makeRobloxRequest(`https://users.roblox.com/v1/users/${userId}`, cookie, false).catch(e => {
+                        console.error('Failed to get user details:', e);
+                        return { created: null, description: 'N/A' };
+                    }),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, cookie, false).catch(e => {
+                        console.error('Failed to get friends count:', e);
+                        return { count: 0 };
+                    }),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, cookie, false).catch(e => {
+                        console.error('Failed to get followers count:', e);
+                        return { count: 0 };
+                    }),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followings/count`, cookie, false).catch(e => {
+                        console.error('Failed to get following count:', e);
+                        return { count: 0 };
+                    })
                 ]);
+                console.log('✓ Public data fetched');
 
-                // Fetch authenticated data (with fallbacks)
+                // Fetch authenticated data (these require cookie authentication)
+                console.log('Fetching authenticated data...');
                 let birthdate = { birthMonth: 0, birthDay: 0, birthYear: 0 };
                 let gender = { gender: 0 };
                 let accountInfo = {};
@@ -915,38 +966,57 @@
                 let emailInfo = {};
                 let phoneInfo = {};
                 
-                // Try authenticated endpoints
+                // Try authenticated endpoints with detailed logging
+                console.log('→ Fetching birthdate...');
                 try {
                     birthdate = await makeRobloxRequest('https://accountinformation.roblox.com/v1/birthdate', cookie, true);
-                } catch (e) { console.log('Birthdate not available'); }
+                    console.log('✓ Birthdate fetched');
+                } catch (e) { console.log('✗ Birthdate not available:', e.message); }
                 
+                console.log('→ Fetching gender...');
                 try {
                     gender = await makeRobloxRequest('https://accountinformation.roblox.com/v1/gender', cookie, true);
-                } catch (e) { console.log('Gender not available'); }
+                    console.log('✓ Gender fetched');
+                } catch (e) { console.log('✗ Gender not available:', e.message); }
                 
+                console.log('→ Fetching account metadata...');
                 try {
                     accountInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/metadata', cookie, true);
-                } catch (e) { console.log('Account info not available'); }
+                    console.log('✓ Account metadata fetched');
+                } catch (e) { console.log('✗ Account metadata not available:', e.message); }
                 
+                console.log('→ Fetching Robux balance...');
                 try {
                     robuxBalance = await makeRobloxRequest(`https://economy.roblox.com/v1/users/${userId}/currency`, cookie, true);
-                } catch (e) { console.log('Robux balance not available'); }
+                    console.log('✓ Robux balance fetched:', robuxBalance.robux);
+                } catch (e) { console.log('✗ Robux balance not available:', e.message); }
                 
+                console.log('→ Fetching transaction totals...');
                 try {
-                    economyInfo = await makeRobloxRequest(`https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`, cookie, true);
-                } catch (e) { console.log('Economy info not available'); }
+                    const transactionsUrl = `https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`;
+                    economyInfo = await makeRobloxRequest(transactionsUrl, cookie, true);
+                    console.log('✓ Transaction totals fetched');
+                } catch (e) { console.log('✗ Transaction totals not available:', e.message); }
                 
+                console.log('→ Fetching premium status...');
                 try {
                     premiumInfo = await makeRobloxRequest(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, cookie, true);
-                } catch (e) { console.log('Premium info not available'); }
+                    console.log('✓ Premium status fetched');
+                } catch (e) { console.log('✗ Premium status not available:', e.message); }
                 
+                console.log('→ Fetching email info...');
                 try {
                     emailInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/email', cookie, true);
-                } catch (e) { console.log('Email info not available'); }
+                    console.log('✓ Email info fetched');
+                } catch (e) { console.log('✗ Email info not available:', e.message); }
                 
+                console.log('→ Fetching phone info...');
                 try {
                     phoneInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/phone', cookie, true);
-                } catch (e) { console.log('Phone info not available'); }
+                    console.log('✓ Phone info fetched');
+                } catch (e) { console.log('✗ Phone info not available:', e.message); }
+                
+                console.log('Data fetching complete!');
 
                 // Store data in memory
                 userData = {
