@@ -792,69 +792,262 @@
     </div>
 
     <script>
-        // Global state management using JavaScript variables
+        // Global state management using JavaScript variables (no localStorage due to sandbox)
         let userData = null;
         let currentCookie = '';
         
-        // Multiple CORS proxy options to try
-        const CORS_PROXIES = [
-            'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url=',
-            'https://cors-anywhere.herokuapp.com/'
-        ];
-        let currentProxyIndex = 0;
-
-        // Helper function to make authenticated requests with multiple proxy attempts
-        async function makeRobloxRequest(url, cookie, needsAuth = false) {
-            // Try direct request first (works if user has CORS extension or if endpoint allows it)
-            if (needsAuth) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        credentials: 'include',
-                        headers: {
-                            'Cookie': `.ROBLOSECURITY=${cookie}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        return await response.json();
-                    }
-                } catch (e) {
-                    console.log('Direct request failed, trying proxies...', e.message);
-                }
+        // RobloxAPI Class - Same structure as Discord bot
+        class RobloxAPI {
+            constructor(cookie) {
+                this.cookie = cookie;
+                // Multiple CORS proxies to try (matching bot's approach)
+                this.corsProxies = [
+                    'https://api.allorigins.win/raw?url=',
+                    'https://corsproxy.io/?',
+                    'https://cors-anywhere.herokuapp.com/'
+                ];
             }
             
-            // Try all CORS proxies
-            for (let i = 0; i < CORS_PROXIES.length; i++) {
-                try {
-                    const proxy = CORS_PROXIES[i];
-                    const proxyUrl = proxy + (proxy.includes('?') ? '' : '') + encodeURIComponent(url);
-                    
-                    console.log(`Trying proxy ${i + 1}/${CORS_PROXIES.length}: ${proxy}`);
-                    
-                    const response = await fetch(proxyUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json'
+            // Main request function with proxy fallback
+            async makeRequest(url, needsAuth = false) {
+                // Try direct request first (works if user has CORS extension)
+                if (needsAuth) {
+                    try {
+                        console.log(`→ Direct request to: ${url}`);
+                        const response = await fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Cookie': `.ROBLOSECURITY=${this.cookie}`,
+                                'Content-Type': 'application/json',
+                                'User-Agent': 'Mozilla/5.0'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            console.log('✓ Direct request successful');
+                            return await response.json();
                         }
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Success with proxy:', proxy);
-                        return data;
+                    } catch (e) {
+                        console.log('✗ Direct request failed, trying proxies...', e.message);
                     }
+                }
+                
+                // Try all CORS proxies
+                for (let i = 0; i < this.corsProxies.length; i++) {
+                    try {
+                        const proxy = this.corsProxies[i];
+                        const proxyUrl = proxy + encodeURIComponent(url);
+                        
+                        console.log(`→ Trying proxy ${i + 1}/${this.corsProxies.length}: ${proxy}`);
+                        
+                        const response = await fetch(proxyUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('✓ Success with proxy:', proxy);
+                            return data;
+                        }
+                    } catch (error) {
+                        console.log(`✗ Proxy ${i + 1} failed:`, error.message);
+                        if (i === this.corsProxies.length - 1) {
+                            throw error;
+                        }
+                    }
+                }
+                
+                throw new Error('All proxy attempts failed');
+            }
+            
+            // Bot's primary endpoint - validates cookie and gets user
+            async getAuthenticatedUser() {
+                console.log('📡 Getting authenticated user (bot endpoint)...');
+                return await this.makeRequest('https://users.roblox.com/v1/users/authenticated', true);
+            }
+            
+            // Get user details
+            async getUserDetails(userId) {
+                console.log(`📡 Getting user details for ${userId}...`);
+                return await this.makeRequest(`https://users.roblox.com/v1/users/${userId}`, false);
+            }
+            
+            // Get friends count
+            async getFriendsCount(userId) {
+                console.log(`📡 Getting friends count for ${userId}...`);
+                return await this.makeRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, false);
+            }
+            
+            // Get followers count
+            async getFollowersCount(userId) {
+                console.log(`📡 Getting followers count for ${userId}...`);
+                return await this.makeRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, false);
+            }
+            
+            // Get following count
+            async getFollowingCount(userId) {
+                console.log(`📡 Getting following count for ${userId}...`);
+                return await this.makeRequest(`https://friends.roblox.com/v1/users/${userId}/followings/count`, false);
+            }
+            
+            // Get Robux balance
+            async getRobux(userId) {
+                console.log(`📡 Getting Robux balance for ${userId}...`);
+                return await this.makeRequest(`https://economy.roblox.com/v1/users/${userId}/currency`, true);
+            }
+            
+            // Get transactions
+            async getTransactions(userId) {
+                console.log(`📡 Getting transaction totals for ${userId}...`);
+                return await this.makeRequest(`https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`, true);
+            }
+            
+            // Get premium status
+            async getPremiumStatus(userId) {
+                console.log(`📡 Getting premium status for ${userId}...`);
+                return await this.makeRequest(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, true);
+            }
+            
+            // Get birthdate
+            async getBirthdate() {
+                console.log('📡 Getting birthdate...');
+                return await this.makeRequest('https://accountinformation.roblox.com/v1/birthdate', true);
+            }
+            
+            // Get gender
+            async getGender() {
+                console.log('📡 Getting gender...');
+                return await this.makeRequest('https://accountinformation.roblox.com/v1/gender', true);
+            }
+            
+            // Get account metadata
+            async getAccountMetadata() {
+                console.log('📡 Getting account metadata...');
+                return await this.makeRequest('https://accountinformation.roblox.com/v1/metadata', true);
+            }
+            
+            // Get email info
+            async getEmailInfo() {
+                console.log('📡 Getting email info...');
+                return await this.makeRequest('https://accountinformation.roblox.com/v1/email', true);
+            }
+            
+            // Get phone info
+            async getPhoneInfo() {
+                console.log('📡 Getting phone info...');
+                return await this.makeRequest('https://accountinformation.roblox.com/v1/phone', true);
+            }
+            
+            // Calculate account age from created date
+            calculateAccountAge(createdDate) {
+                if (!createdDate) return 'N/A';
+                const created = new Date(createdDate);
+                const now = new Date();
+                const diffTime = Math.abs(now - created);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const years = Math.floor(diffDays / 365);
+                const days = diffDays % 365;
+                return `${years}y ${days}d`;
+            }
+            
+            // Main function: Get all data (same as bot)
+            async getAllData() {
+                try {
+                    console.log('🚀 Starting data fetch (bot logic)...');
+                    
+                    // Step 1: Validate cookie and get authenticated user (same as bot)
+                    const authUser = await this.getAuthenticatedUser();
+                    
+                    if (!authUser || !authUser.id) {
+                        throw new Error('Invalid cookie or authentication failed');
+                    }
+                    
+                    const userId = authUser.id;
+                    console.log(`✓ Authenticated as: ${authUser.name} (ID: ${userId})`);
+                    
+                    // Step 2: Fetch all data in parallel (same as bot)
+                    console.log('🔄 Fetching all data in parallel...');
+                    const [
+                        userDetails,
+                        friendsCount,
+                        followersCount,
+                        followingCount,
+                        robux,
+                        transactions,
+                        premium,
+                        birthdate,
+                        gender,
+                        accountInfo,
+                        emailInfo,
+                        phoneInfo
+                    ] = await Promise.all([
+                        this.getUserDetails(userId).catch(() => ({ created: null, description: 'N/A' })),
+                        this.getFriendsCount(userId).catch(() => ({ count: 0 })),
+                        this.getFollowersCount(userId).catch(() => ({ count: 0 })),
+                        this.getFollowingCount(userId).catch(() => ({ count: 0 })),
+                        this.getRobux(userId).catch(() => ({ robux: 0 })),
+                        this.getTransactions(userId).catch(() => ({ salesTotal: 0, purchasesTotal: 0, pendingRobuxTotal: 0 })),
+                        this.getPremiumStatus(userId).catch(() => ({ isPremium: false })),
+                        this.getBirthdate().catch(() => ({ birthMonth: 0, birthDay: 0, birthYear: 0 })),
+                        this.getGender().catch(() => ({ gender: 0 })),
+                        this.getAccountMetadata().catch(() => ({})),
+                        this.getEmailInfo().catch(() => ({})),
+                        this.getPhoneInfo().catch(() => ({}))
+                    ]);
+                    
+                    console.log('✓ All data fetched successfully!');
+                    
+                    // Step 3: Compile and return data (same format as bot)
+                    return {
+                        success: true,
+                        data: {
+                            // Basic info
+                            userId: authUser.id,
+                            username: authUser.name,
+                            displayName: authUser.displayName,
+                            
+                            // Details
+                            description: userDetails.description || 'N/A',
+                            created: userDetails.created,
+                            accountAge: this.calculateAccountAge(userDetails.created),
+                            
+                            // Social
+                            friendsCount: friendsCount.count || 0,
+                            followersCount: followersCount.count || 0,
+                            followingCount: followingCount.count || 0,
+                            
+                            // Economy
+                            robux: robux.robux || 0,
+                            salesTotal: transactions.salesTotal || 0,
+                            purchases: transactions.purchasesTotal || 0,
+                            pendingRobux: transactions.pendingRobuxTotal || 0,
+                            summary: (transactions.salesTotal || 0) - (transactions.purchasesTotal || 0),
+                            
+                            // Premium
+                            isPremium: premium.isPremium || false,
+                            
+                            // Personal
+                            birthdate: birthdate,
+                            gender: gender.gender || 0,
+                            
+                            // Account security
+                            accountInfo: accountInfo,
+                            emailInfo: emailInfo,
+                            phoneInfo: phoneInfo
+                        }
+                    };
                 } catch (error) {
-                    console.log(`Proxy ${i + 1} failed:`, error.message);
-                    if (i === CORS_PROXIES.length - 1) {
-                        throw error;
-                    }
+                    console.error('❌ Error in getAllData:', error);
+                    return {
+                        success: false,
+                        error: error.message
+                    };
                 }
             }
-            
-            throw new Error('All proxy attempts failed');
         }
 
         // Format number with commas
@@ -893,7 +1086,7 @@
             }
         }
 
-        // Main function to load profile data
+        // Main function to load profile data (uses bot logic)
         async function loadProfileData() {
             clearError();
             
@@ -905,7 +1098,7 @@
                 return;
             }
 
-            // Store cookie in memory
+            // Store cookie in memory (no sessionStorage due to sandbox)
             currentCookie = cookie;
 
             // Disable button and show loading
@@ -916,133 +1109,34 @@
             document.getElementById('dashboard').classList.remove('active');
 
             try {
-                // First, try to get authenticated user (validates cookie)
-                console.log('Fetching authenticated user...');
-                let authUser, userId;
+                console.log('═══════════════════════════════════════');
+                console.log('🚀 INITIALIZING CONNECTION (BOT LOGIC)');
+                console.log('═══════════════════════════════════════');
                 
-                try {
-                    authUser = await makeRobloxRequest(
-                        'https://users.roblox.com/v1/users/authenticated',
-                        cookie,
-                        true
-                    );
-                    userId = authUser.id;
-                    console.log('✓ Authenticated user:', userId);
-                } catch (error) {
-                    console.error('Failed to authenticate:', error);
-                    throw new Error('Could not validate cookie. Make sure it\'s correct and try enabling a CORS browser extension.');
+                // Create RobloxAPI instance (same as Discord bot)
+                const api = new RobloxAPI(cookie);
+                
+                // Get all data using bot's logic
+                const result = await api.getAllData();
+                
+                if (result.success) {
+                    console.log('✓ CONNECTION SUCCESSFUL!');
+                    console.log('═══════════════════════════════════════');
+                    
+                    // Store data in memory
+                    userData = result.data;
+                    
+                    // Update UI with fetched data
+                    updateDashboardFromBotData(result.data);
+                    
+                    // Hide loading, show dashboard
+                    document.getElementById('loadingContainer').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
+                    loadBtn.disabled = false;
+                    loadBtn.textContent = '⚡ INITIALIZE CONNECTION';
+                } else {
+                    throw new Error(result.error);
                 }
-
-                // Fetch public data (works without auth)
-                console.log('Fetching public data...');
-                const [userDetails, friendsCount, followersCount, followingCount] = await Promise.all([
-                    makeRobloxRequest(`https://users.roblox.com/v1/users/${userId}`, cookie, false).catch(e => {
-                        console.error('Failed to get user details:', e);
-                        return { created: null, description: 'N/A' };
-                    }),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, cookie, false).catch(e => {
-                        console.error('Failed to get friends count:', e);
-                        return { count: 0 };
-                    }),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, cookie, false).catch(e => {
-                        console.error('Failed to get followers count:', e);
-                        return { count: 0 };
-                    }),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followings/count`, cookie, false).catch(e => {
-                        console.error('Failed to get following count:', e);
-                        return { count: 0 };
-                    })
-                ]);
-                console.log('✓ Public data fetched');
-
-                // Fetch authenticated data (these require cookie authentication)
-                console.log('Fetching authenticated data...');
-                let birthdate = { birthMonth: 0, birthDay: 0, birthYear: 0 };
-                let gender = { gender: 0 };
-                let accountInfo = {};
-                let economyInfo = {};
-                let premiumInfo = { isPremium: false };
-                let robuxBalance = { robux: 0 };
-                let emailInfo = {};
-                let phoneInfo = {};
-                
-                // Try authenticated endpoints with detailed logging
-                console.log('→ Fetching birthdate...');
-                try {
-                    birthdate = await makeRobloxRequest('https://accountinformation.roblox.com/v1/birthdate', cookie, true);
-                    console.log('✓ Birthdate fetched');
-                } catch (e) { console.log('✗ Birthdate not available:', e.message); }
-                
-                console.log('→ Fetching gender...');
-                try {
-                    gender = await makeRobloxRequest('https://accountinformation.roblox.com/v1/gender', cookie, true);
-                    console.log('✓ Gender fetched');
-                } catch (e) { console.log('✗ Gender not available:', e.message); }
-                
-                console.log('→ Fetching account metadata...');
-                try {
-                    accountInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/metadata', cookie, true);
-                    console.log('✓ Account metadata fetched');
-                } catch (e) { console.log('✗ Account metadata not available:', e.message); }
-                
-                console.log('→ Fetching Robux balance...');
-                try {
-                    robuxBalance = await makeRobloxRequest(`https://economy.roblox.com/v1/users/${userId}/currency`, cookie, true);
-                    console.log('✓ Robux balance fetched:', robuxBalance.robux);
-                } catch (e) { console.log('✗ Robux balance not available:', e.message); }
-                
-                console.log('→ Fetching transaction totals...');
-                try {
-                    const transactionsUrl = `https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`;
-                    economyInfo = await makeRobloxRequest(transactionsUrl, cookie, true);
-                    console.log('✓ Transaction totals fetched');
-                } catch (e) { console.log('✗ Transaction totals not available:', e.message); }
-                
-                console.log('→ Fetching premium status...');
-                try {
-                    premiumInfo = await makeRobloxRequest(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, cookie, true);
-                    console.log('✓ Premium status fetched');
-                } catch (e) { console.log('✗ Premium status not available:', e.message); }
-                
-                console.log('→ Fetching email info...');
-                try {
-                    emailInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/email', cookie, true);
-                    console.log('✓ Email info fetched');
-                } catch (e) { console.log('✗ Email info not available:', e.message); }
-                
-                console.log('→ Fetching phone info...');
-                try {
-                    phoneInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/phone', cookie, true);
-                    console.log('✓ Phone info fetched');
-                } catch (e) { console.log('✗ Phone info not available:', e.message); }
-                
-                console.log('Data fetching complete!');
-
-                // Store data in memory
-                userData = {
-                    authUser,
-                    userDetails,
-                    friendsCount,
-                    followersCount,
-                    followingCount,
-                    birthdate,
-                    gender,
-                    accountInfo,
-                    economyInfo,
-                    premiumInfo,
-                    robuxBalance,
-                    emailInfo,
-                    phoneInfo
-                };
-
-                // Update UI
-                updateDashboard(userData);
-
-                // Hide loading, show dashboard
-                document.getElementById('loadingContainer').style.display = 'none';
-                document.getElementById('dashboard').classList.add('active');
-                loadBtn.disabled = false;
-                loadBtn.textContent = '⚡ INITIALIZE CONNECTION';
 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -1085,88 +1179,72 @@
             requestAnimationFrame(update);
         }
 
-        // Update dashboard with fetched data
-        function updateDashboard(data) {
-            const { authUser, userDetails, friendsCount, followersCount, followingCount, birthdate, gender, accountInfo, economyInfo, premiumInfo, robuxBalance, emailInfo, phoneInfo } = data;
-
+        // Update dashboard with bot data format
+        function updateDashboardFromBotData(data) {
             // Token status
             const tokenElement = document.getElementById('tokenValid');
             tokenElement.textContent = 'ONLINE';
             tokenElement.className = 'status-badge status-valid';
 
             // Basic info
-            document.getElementById('userId').textContent = authUser.id || '—';
-            document.getElementById('userName').textContent = authUser.name || '—';
-            document.getElementById('displayName').textContent = authUser.displayName || '—';
-            
-            // Calculate account age
-            if (userDetails.created) {
-                const createdDate = new Date(userDetails.created);
-                const now = new Date();
-                const ageInDays = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
-                const years = Math.floor(ageInDays / 365);
-                const days = ageInDays % 365;
-                document.getElementById('accountAge').textContent = years > 0 ? `${years}y ${days}d` : `${days} days`;
-            }
+            document.getElementById('userId').textContent = data.userId || '—';
+            document.getElementById('userName').textContent = data.username || '—';
+            document.getElementById('displayName').textContent = data.displayName || '—';
+            document.getElementById('accountAge').textContent = data.accountAge || '—';
 
             // Robux with animation
             const robuxElement = document.getElementById('robuxAmount');
-            const robuxValue = robuxBalance?.robux || 0;
-            animateNumber(robuxElement, robuxValue);
+            animateNumber(robuxElement, data.robux || 0);
 
             // Premium status
-            updateStatusBadge('premium', premiumInfo?.isPremium || false);
+            updateStatusBadge('premium', data.isPremium);
 
             // Security info
-            updateStatusBadge('hasPin', accountInfo?.IsAccountPinEnabled);
-            updateStatusBadge('twoStepEnabled', accountInfo?.IsTwoStepEnabled);
-            updateStatusBadge('email2FA', emailInfo?.emailAddress ? true : false);
-            updateStatusBadge('emailVerified', accountInfo?.IsEmailVerified);
+            updateStatusBadge('hasPin', data.accountInfo?.IsAccountPinEnabled);
+            updateStatusBadge('twoStepEnabled', data.accountInfo?.IsTwoStepEnabled);
+            updateStatusBadge('email2FA', data.emailInfo?.emailAddress ? true : false);
+            updateStatusBadge('emailVerified', data.accountInfo?.IsEmailVerified);
 
             // Age verification
             const ageCutoff = new Date();
             ageCutoff.setFullYear(ageCutoff.getFullYear() - 13);
-            const userBirthdate = new Date(birthdate?.birthYear || 2010, (birthdate?.birthMonth || 1) - 1, birthdate?.birthDay || 1);
+            const userBirthdate = new Date(
+                data.birthdate?.birthYear || 2010, 
+                (data.birthdate?.birthMonth || 1) - 1, 
+                data.birthdate?.birthDay || 1
+            );
             const isAbove13 = userBirthdate <= ageCutoff;
             updateStatusBadge('above13', isAbove13);
 
             // Birthdate
-            if (birthdate && birthdate.birthMonth && birthdate.birthDay && birthdate.birthYear) {
-                document.getElementById('birthdate').textContent = `${birthdate.birthMonth}/${birthdate.birthDay}/${birthdate.birthYear}`;
+            if (data.birthdate && data.birthdate.birthMonth && data.birthdate.birthDay && data.birthdate.birthYear) {
+                document.getElementById('birthdate').textContent = 
+                    `${data.birthdate.birthMonth}/${data.birthdate.birthDay}/${data.birthdate.birthYear}`;
             } else {
                 document.getElementById('birthdate').textContent = 'PRIVATE';
             }
             
             // Gender mapping
             const genderMap = { 1: 'MALE', 2: 'FEMALE', 3: 'UNKNOWN' };
-            document.getElementById('gender').textContent = genderMap[gender?.gender] || 'UNKNOWN';
+            document.getElementById('gender').textContent = genderMap[data.gender] || 'UNKNOWN';
 
             // Social with animation
-            const friendsElement = document.getElementById('friendsCount');
-            const followersElement = document.getElementById('followersCount');
-            const followingElement = document.getElementById('followingCount');
-            animateNumber(friendsElement, friendsCount?.count || 0);
-            animateNumber(followersElement, followersCount?.count || 0);
-            animateNumber(followingElement, followingCount?.count || 0);
+            animateNumber(document.getElementById('friendsCount'), data.friendsCount || 0);
+            animateNumber(document.getElementById('followersCount'), data.followersCount || 0);
+            animateNumber(document.getElementById('followingCount'), data.followingCount || 0);
 
             // Transactions
-            if (economyInfo && economyInfo.salesTotal !== undefined) {
-                document.getElementById('salesTotal').textContent = formatNumber(economyInfo.salesTotal) + ' R$';
-                document.getElementById('purchases').textContent = formatNumber(economyInfo.purchasesTotal) + ' R$';
-                document.getElementById('pendingRobux').textContent = formatNumber(economyInfo.pendingRobuxTotal) + ' R$';
-            } else {
-                document.getElementById('salesTotal').textContent = '0 R$';
-                document.getElementById('purchases').textContent = '0 R$';
-                document.getElementById('pendingRobux').textContent = '0 R$';
-            }
+            document.getElementById('salesTotal').textContent = formatNumber(data.salesTotal || 0) + ' R$';
+            document.getElementById('purchases').textContent = formatNumber(data.purchases || 0) + ' R$';
+            document.getElementById('pendingRobux').textContent = formatNumber(data.pendingRobux || 0) + ' R$';
 
             // Personal info
-            document.getElementById('email').textContent = emailInfo?.emailAddress ? 'VERIFIED' : 'NOT SET';
-            document.getElementById('phone').textContent = phoneInfo?.phone ? 'VERIFIED' : 'NOT SET';
-            document.getElementById('country').textContent = phoneInfo?.countryCode || 'UNKNOWN';
+            document.getElementById('email').textContent = data.emailInfo?.emailAddress ? 'VERIFIED' : 'NOT SET';
+            document.getElementById('phone').textContent = data.phoneInfo?.phone ? 'VERIFIED' : 'NOT SET';
+            document.getElementById('country').textContent = data.phoneInfo?.countryCode || 'UNKNOWN';
             
             // Description
-            document.getElementById('description').textContent = userDetails.description || 'No description available';
+            document.getElementById('description').textContent = data.description || 'No description available';
         }
 
         // Clear all data
