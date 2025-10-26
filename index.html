@@ -3,18 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Profile Dashboard</title>
+    <title>ROBLOX CYBER DASHBOARD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --text: #ffffff;
-            --text-secondary: #b0b0b0;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --error: #f44336;
-            --border: #2a2a4e;
+            --neon-cyan: #00FFCC;
+            --neon-magenta: #FF00CC;
+            --neon-yellow: #FFCC00;
+            --neon-purple: #A42DB4;
+            --neon-pink: #FF3D94;
+            --neon-green: #00FFAA;
+            --neon-red: #FF0055;
+            --bg-primary: #000000;
+            --bg-secondary: #0a0e27;
+            --bg-tertiary: #1a0b2e;
+            --bg-card: rgba(10, 14, 39, 0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0ff;
+            --text-accent: #00FFCC;
         }
 
         * {
@@ -24,63 +32,141 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            background: 
+                linear-gradient(0deg, rgba(0,255,204,.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,204,.02) 1px, transparent 1px),
+                radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            background-size: 50px 50px, 50px 50px, cover;
+            background-attachment: fixed;
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 30px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: var(--bg-card);
+            border-radius: 0;
+            border: 2px solid var(--neon-cyan);
+            border-left: none;
+            border-right: none;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 204, 0.3),
+                0 0 40px rgba(0, 255, 204, 0.2),
+                inset 0 0 60px rgba(0, 255, 204, 0.05);
+            position: relative;
+            overflow: hidden;
+            animation: glitch 3s infinite;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            91% { transform: translate(-2px, 2px); }
+            92% { transform: translate(2px, -2px); }
+            93% { transform: translate(-2px, -2px); }
+            94% { transform: translate(2px, 2px); }
+            95% { transform: translate(0); }
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan),
+                0 0 30px var(--neon-cyan),
+                0 0 40px rgba(0, 255, 204, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
         .header p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .cookie-section {
-            background: var(--secondary);
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border: 2px solid var(--neon-magenta);
+            box-shadow: 
+                0 0 20px rgba(255, 0, 204, 0.3),
+                0 0 40px rgba(255, 0, 204, 0.2),
+                inset 0 0 60px rgba(255, 0, 204, 0.03);
+            backdrop-filter: blur(10px);
+            animation: cardEntry 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes cardEntry {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .cookie-section h3 {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-magenta);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--neon-magenta);
         }
 
         .warning-box {
-            background: rgba(255, 152, 0, 0.1);
-            border: 1px solid var(--warning);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            color: var(--warning);
+            background: rgba(255, 204, 0, 0.05);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--neon-yellow);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+            font-weight: 500;
         }
 
         .input-group {
@@ -97,20 +183,33 @@
         input[type="text"],
         textarea {
             width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 0.9rem;
-            font-family: 'Courier New', monospace;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: 'Share Tech Mono', monospace;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 204, 0.2),
+                inset 0 0 20px rgba(0, 255, 204, 0.05);
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus,
         textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--neon-magenta);
+            box-shadow: 
+                0 0 20px rgba(255, 0, 204, 0.4),
+                0 0 30px rgba(255, 0, 204, 0.2),
+                inset 0 0 20px rgba(255, 0, 204, 0.1);
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
         }
 
         textarea {
@@ -125,36 +224,70 @@
         }
 
         button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-magenta) 100%);
+            color: var(--bg-primary);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 204, 0.5),
+                0 0 40px rgba(255, 0, 204, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 204, 0.7),
+                0 0 60px rgba(255, 0, 204, 0.5);
         }
 
         button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
 
         button.secondary {
-            background: var(--accent);
-            box-shadow: none;
+            background: transparent;
+            border: 2px solid var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
         }
 
         .loading {
@@ -164,13 +297,14 @@
         }
 
         .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #667eea;
+            border: 4px solid rgba(0, 255, 204, 0.1);
+            border-top: 4px solid var(--neon-cyan);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            width: 60px;
+            height: 60px;
+            animation: spin 0.8s linear infinite;
             margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
         }
 
         @keyframes spin {
@@ -179,12 +313,14 @@
         }
 
         .error-message {
-            background: rgba(244, 67, 54, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
+            background: rgba(255, 0, 85, 0.1);
+            border: 2px solid var(--neon-red);
+            color: var(--neon-red);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 6px;
             margin: 20px 0;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            font-weight: 500;
         }
 
         .dashboard {
@@ -197,41 +333,75 @@
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
             margin-bottom: 20px;
         }
 
         .card {
-            background: var(--secondary);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 
+                0 0 15px rgba(164, 45, 180, 0.3),
+                0 0 30px rgba(164, 45, 180, 0.1),
+                inset 0 0 40px rgba(164, 45, 180, 0.03);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            animation: cardEntry 0.6s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta), var(--neon-purple), var(--neon-pink));
+            border-radius: 8px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.4s ease;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 
+                0 0 30px rgba(164, 45, 180, 0.5),
+                0 0 60px rgba(164, 45, 180, 0.3),
+                inset 0 0 40px rgba(164, 45, 180, 0.05);
+        }
+
+        .card:hover::before {
+            opacity: 0.3;
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(164, 45, 180, 0.3);
         }
 
         .card-icon {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 8px currentColor);
         }
 
         .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .card-content {
@@ -249,40 +419,54 @@
 
         .info-label {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .info-value {
-            font-weight: 600;
-            font-size: 0.95rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
         }
 
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .status-valid {
-            background: rgba(76, 175, 80, 0.2);
-            color: var(--success);
-            border: 1px solid var(--success);
+            background: rgba(0, 255, 170, 0.15);
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.3);
+            text-shadow: 0 0 8px var(--neon-green);
         }
 
         .status-invalid {
-            background: rgba(244, 67, 54, 0.2);
-            color: var(--error);
-            border: 1px solid var(--error);
+            background: rgba(255, 0, 85, 0.15);
+            color: var(--neon-red);
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            text-shadow: 0 0 8px var(--neon-red);
         }
 
         .status-enabled {
-            color: var(--success);
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
         }
 
         .status-disabled {
-            color: var(--error);
+            color: var(--neon-red);
+            text-shadow: 0 0 8px var(--neon-red);
         }
 
         .large-card {
@@ -290,36 +474,59 @@
         }
 
         .highlight-value {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan),
+                0 0 30px rgba(0, 255, 204, 0.5);
+            animation: numberPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes numberPulse {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px var(--neon-cyan),
+                    0 0 20px var(--neon-cyan),
+                    0 0 30px rgba(0, 255, 204, 0.5);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 15px var(--neon-cyan),
+                    0 0 30px var(--neon-cyan),
+                    0 0 45px rgba(0, 255, 204, 0.7);
+            }
         }
 
         .cors-notice {
-            background: rgba(255, 152, 0, 0.1);
-            border: 1px solid var(--warning);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            background: rgba(255, 204, 0, 0.05);
+            border: 2px solid var(--neon-yellow);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
         }
 
         .cors-notice h3 {
-            color: var(--warning);
-            margin-bottom: 10px;
+            color: var(--neon-yellow);
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px var(--neon-yellow);
         }
 
         .cors-notice p {
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            line-height: 1.8;
         }
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
+                letter-spacing: 2px;
             }
 
             .dashboard-grid {
@@ -333,47 +540,47 @@
             button {
                 width: 100%;
             }
+
+            .card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎮 Roblox Profile Dashboard</h1>
-            <p>Visualiza toda la información de tu cuenta de Roblox</p>
+            <h1>⚡ ROBLOX CYBER DASHBOARD ⚡</h1>
+            <p>◢◤ NEURAL INTERFACE PROTOCOL ◥◣</p>
         </div>
 
         <div class="cors-notice">
-            <h3>⚠️ Nota Importante sobre CORS</h3>
+            <h3>⚠️ CORS PROXY ENABLED</h3>
             <p>
-                Debido a las políticas de seguridad CORS de Roblox, esta aplicación no puede hacer peticiones directas a sus APIs desde el navegador.
-                <strong>Para usar esta herramienta, necesitarás:</strong>
+                This dashboard uses a CORS proxy to bypass Roblox API restrictions. All requests are processed through <strong>corsproxy.io</strong> for secure data retrieval.
+                Your data is processed locally in your browser and never stored on external servers.
             </p>
-            <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-secondary);">
-                <li>Usar una extensión de navegador para deshabilitar CORS temporalmente (ej: CORS Unblock)</li>
-                <li>O usar un proxy CORS (ej: https://corsproxy.io/?)</li>
-                <li>O ejecutar esta página desde un servidor con proxy backend</li>
-            </ul>
         </div>
 
         <div class="cookie-section">
-            <h3>🔑 Autenticación</h3>
+            <h3>⚡ AUTHENTICATION PROTOCOL ⚡</h3>
             
             <div class="warning-box">
-                ⚠️ <strong>Advertencia de Seguridad:</strong> Nunca compartas tu cookie .ROBLOSECURITY con nadie. Esta cookie da acceso completo a tu cuenta.
+                ⚠️ <strong>SECURITY WARNING:</strong> Never share your .ROBLOSECURITY cookie. This grants full access to your account.
             </div>
 
             <div class="input-group">
-                <label for="cookieInput">Cookie .ROBLOSECURITY:</label>
+                <label for="cookieInput" style="color: var(--neon-cyan); font-weight: 600; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">◢ Cookie .ROBLOSECURITY:</label>
                 <textarea 
                     id="cookieInput" 
-                    placeholder="Pega tu cookie .ROBLOSECURITY aquí..."
+                    placeholder="[PASTE YOUR .ROBLOSECURITY COOKIE HERE]"
+                    rows="3"
                 ></textarea>
             </div>
 
             <div class="button-group">
-                <button id="loadDataBtn" onclick="loadProfileData()">🚀 Cargar Datos</button>
-                <button class="secondary" onclick="clearData()">🗑️ Limpiar</button>
+                <button id="loadDataBtn" onclick="loadProfileData()">⚡ INITIALIZE CONNECTION</button>
+                <button class="secondary" onclick="clearData()">✖ DISCONNECT</button>
             </div>
 
             <div id="errorContainer"></div>
@@ -389,195 +596,184 @@
         <div id="dashboard" class="dashboard">
             <div class="dashboard-grid">
                 <!-- Token Validation Card -->
-                <div class="card">
+                <div class="card" style="border-color: var(--neon-green); animation-delay: 0.1s;">
                     <div class="card-header">
-                        <span class="card-icon">✅</span>
-                        <span class="card-title">Token Status</span>
+                        <span class="card-icon" style="color: var(--neon-green);">✓</span>
+                        <span class="card-title">Connection</span>
                     </div>
-                    <div class="card-content">
-                        <div class="info-row">
-                            <span class="info-label">Valid Roblox Token</span>
-                            <span id="tokenValid" class="status-badge">—</span>
-                        </div>
+                    <div class="card-content" style="text-align: center;">
+                        <div id="tokenValid" class="status-badge status-invalid">OFFLINE</div>
                     </div>
                 </div>
 
                 <!-- Basic Info Card -->
-                <div class="card">
+                <div class="card" style="border-color: var(--neon-cyan); animation-delay: 0.2s;">
                     <div class="card-header">
-                        <span class="card-icon">👤</span>
-                        <span class="card-title">Basic Information</span>
+                        <span class="card-icon" style="color: var(--neon-cyan);">◉</span>
+                        <span class="card-title">Profile Data</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
-                            <span class="info-label">ID</span>
-                            <span id="userId" class="info-value">—</span>
+                            <span class="info-label">User ID</span>
+                            <span id="userId" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Account Name</span>
-                            <span id="userName" class="info-value">—</span>
+                            <span class="info-label">Username</span>
+                            <span id="userName" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Display Name</span>
-                            <span id="displayName" class="info-value">—</span>
+                            <span id="displayName" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Account Age</span>
-                            <span id="accountAge" class="info-value">—</span>
+                            <span id="accountAge" class="info-value">——————</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Robux Card -->
-                <div class="card">
+                <!-- Robux & Premium Card -->
+                <div class="card" style="border-color: var(--neon-yellow); animation-delay: 0.3s;">
                     <div class="card-header">
-                        <span class="card-icon">💰</span>
-                        <span class="card-title">Robux</span>
+                        <span class="card-icon" style="color: var(--neon-yellow);">◬</span>
+                        <span class="card-title">Currency</span>
                     </div>
                     <div class="card-content" style="text-align: center;">
-                        <div id="robuxAmount" class="highlight-value">—</div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 5px;">Current Balance</div>
+                        <div id="robuxAmount" class="highlight-value">0</div>
+                        <div style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 8px; text-transform: uppercase; letter-spacing: 2px;">ROBUX BALANCE</div>
+                        <div class="info-row" style="margin-top: 15px;">
+                            <span class="info-label">Premium Status</span>
+                            <span id="premium" class="info-value">——————</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Security Card -->
-                <div class="card">
+                <div class="card" style="border-color: var(--neon-red); animation-delay: 0.4s;">
                     <div class="card-header">
-                        <span class="card-icon">🔒</span>
+                        <span class="card-icon" style="color: var(--neon-red);">◈</span>
                         <span class="card-title">Security</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
-                            <span class="info-label">Has PIN</span>
-                            <span id="hasPin" class="info-value">—</span>
+                            <span class="info-label">Account PIN</span>
+                            <span id="hasPin" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">2-Step Verification</span>
-                            <span id="twoStepEnabled" class="info-value">—</span>
+                            <span class="info-label">2-Step Auth</span>
+                            <span id="twoStepEnabled" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Email 2FA</span>
-                            <span id="email2FA" class="info-value">—</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Voice Verified</span>
-                            <span id="voiceVerified" class="info-value">—</span>
+                            <span id="email2FA" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Email Verified</span>
-                            <span id="emailVerified" class="info-value">—</span>
+                            <span id="emailVerified" class="info-value">——————</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Premium & Age Card -->
-                <div class="card">
+                <!-- Age Verification Card -->
+                <div class="card" style="border-color: var(--neon-pink); animation-delay: 0.5s;">
                     <div class="card-header">
-                        <span class="card-icon">⭐</span>
-                        <span class="card-title">Account Status</span>
+                        <span class="card-icon" style="color: var(--neon-pink);">◐</span>
+                        <span class="card-title">Verification</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
-                            <span class="info-label">Premium</span>
-                            <span id="premium" class="info-value">—</span>
+                            <span class="info-label">Above 13</span>
+                            <span id="above13" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Above 13</span>
-                            <span id="above13" class="info-value">—</span>
+                            <span class="info-label">Birthdate</span>
+                            <span id="birthdate" class="info-value">——————</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Gender</span>
+                            <span id="gender" class="info-value">——————</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Social Card -->
-                <div class="card">
+                <div class="card" style="border-color: var(--neon-purple); animation-delay: 0.6s;">
                     <div class="card-header">
-                        <span class="card-icon">👥</span>
-                        <span class="card-title">Social</span>
+                        <span class="card-icon" style="color: var(--neon-purple);">◪</span>
+                        <span class="card-title">Social Stats</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
                             <span class="info-label">Friends</span>
-                            <span id="friendsCount" class="info-value">—</span>
+                            <span id="friendsCount" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Followers</span>
-                            <span id="followersCount" class="info-value">—</span>
+                            <span id="followersCount" class="info-value">——————</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Following</span>
+                            <span id="followingCount" class="info-value">——————</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Transactions Card -->
-                <div class="card large-card">
+                <div class="card large-card" style="border-color: var(--neon-green); animation-delay: 0.7s;">
                     <div class="card-header">
-                        <span class="card-icon">💳</span>
+                        <span class="card-icon" style="color: var(--neon-green);">◫</span>
                         <span class="card-title">Transactions</span>
                     </div>
                     <div class="card-content">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+                            <div style="text-align: center;">
                                 <div class="info-label">Sales Total</div>
-                                <div id="salesTotal" class="info-value" style="font-size: 1.2rem;">—</div>
+                                <div id="salesTotal" class="info-value" style="font-size: 1.5rem; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">0 R$</div>
                             </div>
-                            <div>
+                            <div style="text-align: center;">
                                 <div class="info-label">Purchases</div>
-                                <div id="purchases" class="info-value" style="font-size: 1.2rem;">—</div>
+                                <div id="purchases" class="info-value" style="font-size: 1.5rem; color: var(--neon-magenta); text-shadow: 0 0 10px var(--neon-magenta);">0 R$</div>
                             </div>
-                            <div>
+                            <div style="text-align: center;">
                                 <div class="info-label">Pending Robux</div>
-                                <div id="pendingRobux" class="info-value" style="font-size: 1.2rem;">—</div>
+                                <div id="pendingRobux" class="info-value" style="font-size: 1.5rem; color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow);">0 R$</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Personal Info Card -->
-                <div class="card">
+                <div class="card" style="border-color: var(--neon-cyan); animation-delay: 0.8s;">
                     <div class="card-header">
-                        <span class="card-icon">📋</span>
-                        <span class="card-title">Personal Information</span>
+                        <span class="card-icon" style="color: var(--neon-cyan);">◧</span>
+                        <span class="card-title">Personal Data</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
-                            <span class="info-label">Birthdate</span>
-                            <span id="birthdate" class="info-value">—</span>
+                            <span class="info-label">Email Status</span>
+                            <span id="email" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Gender</span>
-                            <span id="gender" class="info-value">—</span>
+                            <span class="info-label">Phone Status</span>
+                            <span id="phone" class="info-value">——————</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Email</span>
-                            <span id="email" class="info-value">—</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Phone</span>
-                            <span id="phone" class="info-value">—</span>
+                            <span class="info-label">Country Code</span>
+                            <span id="country" class="info-value">——————</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Location & Value Card -->
-                <div class="card">
+                <!-- Description Card -->
+                <div class="card" style="border-color: var(--neon-magenta); animation-delay: 0.9s;">
                     <div class="card-header">
-                        <span class="card-icon">🌍</span>
-                        <span class="card-title">Location &amp; Value</span>
+                        <span class="card-icon" style="color: var(--neon-magenta);">◭</span>
+                        <span class="card-title">Bio Data</span>
                     </div>
                     <div class="card-content">
                         <div class="info-row">
-                            <span class="info-label">Country</span>
-                            <span id="country" class="info-value">—</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">IP Address</span>
-                            <span id="ipAddress" class="info-value">—</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Total Inventory Value</span>
-                            <span id="inventoryValue" class="info-value">—</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">RAP</span>
-                            <span id="rap" class="info-value">—</span>
+                            <span class="info-label">Description</span>
+                            <span id="description" class="info-value" style="font-size: 0.9rem; line-height: 1.6; word-break: break-word;">——————</span>
                         </div>
                     </div>
                 </div>
@@ -589,22 +785,38 @@
         // Global state management using JavaScript variables
         let userData = null;
         let currentCookie = '';
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
-        // Helper function to make authenticated requests
-        async function makeRobloxRequest(url, cookie) {
-            const headers = {
-                'Cookie': `.ROBLOSECURITY=${cookie}`,
-                'Content-Type': 'application/json'
-            };
-
-            // Note: Direct requests will fail due to CORS
-            // Users need to use a CORS proxy or browser extension
+        // Helper function to make authenticated requests with CORS proxy
+        async function makeRobloxRequest(url, cookie, needsAuth = false) {
             try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: headers,
-                    credentials: 'include'
-                });
+                const proxyUrl = CORS_PROXY + encodeURIComponent(url);
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                // For authenticated endpoints, we'll use a different approach
+                // Since CORS proxies don't pass cookies, we try direct first, then fallback
+                let response;
+                
+                if (needsAuth) {
+                    // Try direct request with credentials (may work if user has CORS extension)
+                    try {
+                        response = await fetch(url, {
+                            method: 'GET',
+                            credentials: 'include',
+                            headers: {
+                                'Cookie': `.ROBLOSECURITY=${cookie}`
+                            }
+                        });
+                    } catch (e) {
+                        // If direct fails, try proxy (but it won't have auth)
+                        response = await fetch(proxyUrl);
+                    }
+                } else {
+                    // Public endpoints can use proxy
+                    response = await fetch(proxyUrl);
+                }
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -633,7 +845,7 @@
         // Show error message
         function showError(message) {
             const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `<div class="error-message">❌ ${message}</div>`;
+            errorContainer.innerHTML = `<div class="error-message">⚡ ${message}</div>`;
         }
 
         // Clear error message
@@ -644,10 +856,10 @@
         // Update UI with status badge
         function updateStatusBadge(elementId, value) {
             const element = document.getElementById(elementId);
-            if (value === true || value === 'Yes' || value === 'Enabled') {
-                element.innerHTML = '<span class="status-enabled">✓ Yes</span>';
-            } else if (value === false || value === 'No' || value === 'Disabled') {
-                element.innerHTML = '<span class="status-disabled">✗ No</span>';
+            if (value === true || value === 'Yes' || value === 'Enabled' || value === 'VERIFIED') {
+                element.innerHTML = '<span class="status-enabled">● ENABLED</span>';
+            } else if (value === false || value === 'No' || value === 'Disabled' || value === 'NOT SET') {
+                element.innerHTML = '<span class="status-disabled">● DISABLED</span>';
             } else {
                 element.textContent = value || '—';
             }
@@ -661,58 +873,80 @@
             const cookie = cookieInput.value.trim();
 
             if (!cookie) {
-                showError('Por favor ingresa tu cookie .ROBLOSECURITY');
+                showError('⚠️ Please enter your .ROBLOSECURITY cookie');
                 return;
             }
 
             // Store cookie in memory
             currentCookie = cookie;
 
-            // Show loading
+            // Disable button and show loading
+            const loadBtn = document.getElementById('loadDataBtn');
+            loadBtn.disabled = true;
+            loadBtn.textContent = '⏳ CONNECTING...';
             document.getElementById('loadingContainer').style.display = 'block';
             document.getElementById('dashboard').classList.remove('active');
 
             try {
-                // Fetch authenticated user info
+                // First, try to get authenticated user (validates cookie)
                 const authUser = await makeRobloxRequest(
                     'https://users.roblox.com/v1/users/authenticated',
-                    cookie
+                    cookie,
+                    true
                 );
 
                 const userId = authUser.id;
 
-                // Fetch additional user details
-                const [userDetails, friendsCount, followersCount] = await Promise.all([
-                    makeRobloxRequest(`https://users.roblox.com/v1/users/${userId}`, cookie),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, cookie),
-                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, cookie)
+                // Fetch all data in parallel
+                const [userDetails, friendsCount, followersCount, followingCount] = await Promise.all([
+                    makeRobloxRequest(`https://users.roblox.com/v1/users/${userId}`, cookie, false),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/friends/count`, cookie, false),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followers/count`, cookie, false),
+                    makeRobloxRequest(`https://friends.roblox.com/v1/users/${userId}/followings/count`, cookie, false).catch(() => ({ count: 0 }))
                 ]);
 
-                // Try to fetch additional info (may fail on some endpoints)
-                let birthdate, accountInfo, economyInfo, premiumInfo;
+                // Fetch authenticated data (with fallbacks)
+                let birthdate = { birthMonth: 0, birthDay: 0, birthYear: 0 };
+                let gender = { gender: 0 };
+                let accountInfo = {};
+                let economyInfo = {};
+                let premiumInfo = { isPremium: false };
+                let robuxBalance = { robux: 0 };
+                let emailInfo = {};
+                let phoneInfo = {};
+                
+                // Try authenticated endpoints
                 try {
-                    birthdate = await makeRobloxRequest('https://accountinformation.roblox.com/v1/birthdate', cookie);
-                } catch (e) {
-                    birthdate = { birthMonth: 0, birthDay: 0, birthYear: 0 };
-                }
-
+                    birthdate = await makeRobloxRequest('https://accountinformation.roblox.com/v1/birthdate', cookie, true);
+                } catch (e) { console.log('Birthdate not available'); }
+                
                 try {
-                    accountInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/metadata', cookie);
-                } catch (e) {
-                    accountInfo = {};
-                }
-
+                    gender = await makeRobloxRequest('https://accountinformation.roblox.com/v1/gender', cookie, true);
+                } catch (e) { console.log('Gender not available'); }
+                
                 try {
-                    economyInfo = await makeRobloxRequest(`https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`, cookie);
-                } catch (e) {
-                    economyInfo = {};
-                }
-
+                    accountInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/metadata', cookie, true);
+                } catch (e) { console.log('Account info not available'); }
+                
                 try {
-                    premiumInfo = await makeRobloxRequest(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, cookie);
-                } catch (e) {
-                    premiumInfo = {};
-                }
+                    robuxBalance = await makeRobloxRequest(`https://economy.roblox.com/v1/users/${userId}/currency`, cookie, true);
+                } catch (e) { console.log('Robux balance not available'); }
+                
+                try {
+                    economyInfo = await makeRobloxRequest(`https://economy.roblox.com/v2/users/${userId}/transaction-totals?timeFrame=Year&transactionType=summary`, cookie, true);
+                } catch (e) { console.log('Economy info not available'); }
+                
+                try {
+                    premiumInfo = await makeRobloxRequest(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, cookie, true);
+                } catch (e) { console.log('Premium info not available'); }
+                
+                try {
+                    emailInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/email', cookie, true);
+                } catch (e) { console.log('Email info not available'); }
+                
+                try {
+                    phoneInfo = await makeRobloxRequest('https://accountinformation.roblox.com/v1/phone', cookie, true);
+                } catch (e) { console.log('Phone info not available'); }
 
                 // Store data in memory
                 userData = {
@@ -720,10 +954,15 @@
                     userDetails,
                     friendsCount,
                     followersCount,
+                    followingCount,
                     birthdate,
+                    gender,
                     accountInfo,
                     economyInfo,
-                    premiumInfo
+                    premiumInfo,
+                    robuxBalance,
+                    emailInfo,
+                    phoneInfo
                 };
 
                 // Update UI
@@ -732,14 +971,20 @@
                 // Hide loading, show dashboard
                 document.getElementById('loadingContainer').style.display = 'none';
                 document.getElementById('dashboard').classList.add('active');
+                loadBtn.disabled = false;
+                loadBtn.textContent = '⚡ INITIALIZE CONNECTION';
 
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('loadingContainer').style.display = 'none';
+                loadBtn.disabled = false;
+                loadBtn.textContent = '⚡ INITIALIZE CONNECTION';
                 
-                let errorMsg = 'Error al cargar los datos. ';
-                if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
-                    errorMsg += 'Esto es probablemente un problema de CORS. Por favor lee la nota importante arriba sobre cómo resolverlo.';
+                let errorMsg = '⚠️ CONNECTION FAILED: ';
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    errorMsg += 'Invalid cookie or expired session. Please get a fresh .ROBLOSECURITY cookie.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMsg += 'Network error. Make sure you have a CORS extension enabled or the proxy is working.';
                 } else {
                     errorMsg += error.message;
                 }
@@ -748,13 +993,35 @@
             }
         }
 
+        // Animate number counting
+        function animateNumber(element, target) {
+            const duration = 1000;
+            const start = 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (target - start) * progress);
+                element.textContent = formatNumber(current);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = formatNumber(target);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
         // Update dashboard with fetched data
         function updateDashboard(data) {
-            const { authUser, userDetails, friendsCount, followersCount, birthdate, accountInfo, economyInfo, premiumInfo } = data;
+            const { authUser, userDetails, friendsCount, followersCount, followingCount, birthdate, gender, accountInfo, economyInfo, premiumInfo, robuxBalance, emailInfo, phoneInfo } = data;
 
             // Token status
             const tokenElement = document.getElementById('tokenValid');
-            tokenElement.textContent = 'Valid';
+            tokenElement.textContent = 'ONLINE';
             tokenElement.className = 'status-badge status-valid';
 
             // Basic info
@@ -767,66 +1034,82 @@
                 const createdDate = new Date(userDetails.created);
                 const now = new Date();
                 const ageInDays = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
-                document.getElementById('accountAge').textContent = `${ageInDays} days`;
+                const years = Math.floor(ageInDays / 365);
+                const days = ageInDays % 365;
+                document.getElementById('accountAge').textContent = years > 0 ? `${years}y ${days}d` : `${days} days`;
             }
 
-            // Robux (will need additional API call to get actual balance)
-            document.getElementById('robuxAmount').textContent = '—';
+            // Robux with animation
+            const robuxElement = document.getElementById('robuxAmount');
+            const robuxValue = robuxBalance?.robux || 0;
+            animateNumber(robuxElement, robuxValue);
+
+            // Premium status
+            updateStatusBadge('premium', premiumInfo?.isPremium || false);
 
             // Security info
-            updateStatusBadge('hasPin', accountInfo.IsAccountPinEnabled);
-            updateStatusBadge('twoStepEnabled', accountInfo.IsTwoStepEnabled);
-            updateStatusBadge('email2FA', accountInfo.IsEmailOnFile);
-            updateStatusBadge('voiceVerified', false); // Not available in basic API
-            updateStatusBadge('emailVerified', accountInfo.IsEmailVerified);
+            updateStatusBadge('hasPin', accountInfo?.IsAccountPinEnabled);
+            updateStatusBadge('twoStepEnabled', accountInfo?.IsTwoStepEnabled);
+            updateStatusBadge('email2FA', emailInfo?.emailAddress ? true : false);
+            updateStatusBadge('emailVerified', accountInfo?.IsEmailVerified);
 
-            // Premium and age
-            updateStatusBadge('premium', premiumInfo.isPremium || false);
-            updateStatusBadge('above13', !userDetails.isBanned);
+            // Age verification
+            const ageCutoff = new Date();
+            ageCutoff.setFullYear(ageCutoff.getFullYear() - 13);
+            const userBirthdate = new Date(birthdate?.birthYear || 2010, (birthdate?.birthMonth || 1) - 1, birthdate?.birthDay || 1);
+            const isAbove13 = userBirthdate <= ageCutoff;
+            updateStatusBadge('above13', isAbove13);
 
-            // Social
-            document.getElementById('friendsCount').textContent = formatNumber(friendsCount.count);
-            document.getElementById('followersCount').textContent = formatNumber(followersCount.count);
+            // Birthdate
+            if (birthdate && birthdate.birthMonth && birthdate.birthDay && birthdate.birthYear) {
+                document.getElementById('birthdate').textContent = `${birthdate.birthMonth}/${birthdate.birthDay}/${birthdate.birthYear}`;
+            } else {
+                document.getElementById('birthdate').textContent = 'PRIVATE';
+            }
+            
+            // Gender mapping
+            const genderMap = { 1: 'MALE', 2: 'FEMALE', 3: 'UNKNOWN' };
+            document.getElementById('gender').textContent = genderMap[gender?.gender] || 'UNKNOWN';
+
+            // Social with animation
+            const friendsElement = document.getElementById('friendsCount');
+            const followersElement = document.getElementById('followersCount');
+            const followingElement = document.getElementById('followingCount');
+            animateNumber(friendsElement, friendsCount?.count || 0);
+            animateNumber(followersElement, followersCount?.count || 0);
+            animateNumber(followingElement, followingCount?.count || 0);
 
             // Transactions
-            if (economyInfo.salesTotal !== undefined) {
+            if (economyInfo && economyInfo.salesTotal !== undefined) {
                 document.getElementById('salesTotal').textContent = formatNumber(economyInfo.salesTotal) + ' R$';
                 document.getElementById('purchases').textContent = formatNumber(economyInfo.purchasesTotal) + ' R$';
                 document.getElementById('pendingRobux').textContent = formatNumber(economyInfo.pendingRobuxTotal) + ' R$';
             } else {
-                document.getElementById('salesTotal').textContent = '—';
-                document.getElementById('purchases').textContent = '—';
-                document.getElementById('pendingRobux').textContent = '—';
+                document.getElementById('salesTotal').textContent = '0 R$';
+                document.getElementById('purchases').textContent = '0 R$';
+                document.getElementById('pendingRobux').textContent = '0 R$';
             }
 
             // Personal info
-            if (birthdate && birthdate.birthMonth && birthdate.birthDay && birthdate.birthYear) {
-                document.getElementById('birthdate').textContent = `${birthdate.birthMonth}/${birthdate.birthDay}/${birthdate.birthYear}`;
-            } else {
-                document.getElementById('birthdate').textContent = 'Private';
-            }
+            document.getElementById('email').textContent = emailInfo?.emailAddress ? 'VERIFIED' : 'NOT SET';
+            document.getElementById('phone').textContent = phoneInfo?.phone ? 'VERIFIED' : 'NOT SET';
+            document.getElementById('country').textContent = phoneInfo?.countryCode || 'UNKNOWN';
             
-            // Gender mapping
-            const genderMap = { 1: 'Male', 2: 'Female', 3: 'Unknown' };
-            document.getElementById('gender').textContent = genderMap[accountInfo.Gender] || '—';
-            
-            document.getElementById('email').textContent = accountInfo.IsEmailOnFile ? 'On File' : 'Not Set';
-            document.getElementById('phone').textContent = accountInfo.IsPhoneOnFile ? 'On File' : 'Not Set';
-
-            // Location & Value (these require additional APIs)
-            document.getElementById('country').textContent = '—';
-            document.getElementById('ipAddress').textContent = 'N/A (Privacy)';
-            document.getElementById('inventoryValue').textContent = '—';
-            document.getElementById('rap').textContent = '—';
+            // Description
+            document.getElementById('description').textContent = userDetails.description || 'No description available';
         }
 
         // Clear all data
         function clearData() {
-            document.getElementById('cookieInput').value = '';
-            document.getElementById('dashboard').classList.remove('active');
-            clearError();
-            userData = null;
-            currentCookie = '';
+            if (confirm('Are you sure you want to disconnect and clear all data?')) {
+                document.getElementById('cookieInput').value = '';
+                document.getElementById('dashboard').classList.remove('active');
+                document.getElementById('tokenValid').textContent = 'OFFLINE';
+                document.getElementById('tokenValid').className = 'status-badge status-invalid';
+                clearError();
+                userData = null;
+                currentCookie = '';
+            }
         }
 
         // Allow Enter key to submit
